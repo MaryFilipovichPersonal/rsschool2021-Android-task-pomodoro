@@ -1,20 +1,24 @@
 package com.rsshool2021.android.pomodoro
 
+import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.rsshool2021.android.pomodoro.databinding.ViewHolderTimerBinding
+import java.util.ArrayList
 
-class TimersListAdapter : ListAdapter<Timer, TimerViewHolder> (itemComparator) {
+class TimersListAdapter(private val listener: TimerListener) :
+    ListAdapter<Timer, TimerViewHolder>(itemComparator) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimerViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = ViewHolderTimerBinding.inflate(layoutInflater, parent, false)
-        return TimerViewHolder(binding)
+        return TimerViewHolder(binding, listener, binding.root.context.resources)
     }
 
     override fun onBindViewHolder(holder: TimerViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(currentList[position])
     }
 
     private companion object {
@@ -25,8 +29,7 @@ class TimersListAdapter : ListAdapter<Timer, TimerViewHolder> (itemComparator) {
             }
 
             override fun areContentsTheSame(oldItem: Timer, newItem: Timer): Boolean {
-                return oldItem.currentMs == newItem.currentMs &&
-                        oldItem.isStarted == newItem.isStarted
+                return oldItem == newItem
             }
 
         }
