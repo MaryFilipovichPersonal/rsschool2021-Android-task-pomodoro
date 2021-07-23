@@ -34,6 +34,11 @@ class TimersListFragment : Fragment(), TimerListener {
 
     }
 
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
     override fun start(id: Int) {
         changeTimer(id, null, true)
     }

@@ -5,6 +5,7 @@ import android.graphics.drawable.AnimationDrawable
 import android.os.CountDownTimer
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
+import com.rsshool2021.android.pomodoro.Utils.displayTime
 import com.rsshool2021.android.pomodoro.databinding.ViewHolderTimerBinding
 
 class TimerViewHolder(
@@ -36,7 +37,7 @@ class TimerViewHolder(
                     listener.start(timer.id)
                 }
             }
-            vhtIbRestartTimer.setOnClickListener {
+            vhtIbResetTimer.setOnClickListener {
                 listener.reset(timer.id)
             }
             vhtIbDeleteTimer.setOnClickListener {
@@ -85,25 +86,8 @@ class TimerViewHolder(
         }
     }
 
-    private fun Long.displayTime(): String {
-        if (this <= 0L) {
-            return START_TIME
-        }
-        val h = this / 1000 / 3600
-        val m = this / 1000 % 3600 / 60
-        val s = this / 1000 % 60
-        val ms = this % 1000 / 10
-        return "${getTimerSlot(h)}:${getTimerSlot(m)}:${getTimerSlot(s)}:${getTimerSlot(ms)}"
-    }
-
-    private fun getTimerSlot(count: Long): String {
-        return if (count / 10L > 0) "$count"
-        else "0$count"
-    }
-
     companion object {
-        private const val START_TIME = "00:00:00:00"
-        private const val UNIT_TEN_MS = 10L
+        private const val UNIT_TEN_MS = 1000L
         private const val PERIOD = 1000L * 60L * 60L * 24L // Day
     }
 
