@@ -41,8 +41,11 @@ class PieProgressBar @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (periodMs == 0L || currentMs == 0L) return
-        val startAngel = (((currentMs % periodMs).toFloat() / periodMs) * 360)
+        var startAngel = -90f
+        if (periodMs <= 0L || currentMs < 0L) return
+        if (currentMs == periodMs) startAngel = 360f
+        else
+            startAngel = (((currentMs % periodMs).toFloat() / periodMs) * 360)
 
         canvas.drawArc(
             0f,
@@ -61,12 +64,16 @@ class PieProgressBar @JvmOverloads constructor(
         invalidate()
     }
 
+    fun getProgress() = currentMs
+
     fun setMax(period: Long) {
         periodMs = period
     }
 
+    fun getMax() = periodMs
+
     private companion object {
-        private const val  FILL = 0
+        private const val FILL = 0
     }
 
 }

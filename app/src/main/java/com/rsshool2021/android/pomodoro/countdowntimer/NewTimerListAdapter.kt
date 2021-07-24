@@ -31,6 +31,8 @@ class NewTimerListAdapter (private val listener: TimerListener) :
                 return oldItem == newItem
             }
 
+            override fun getChangePayload(oldItem: NewTimer, newItem: NewTimer) = Any()
+
         }
 
     }

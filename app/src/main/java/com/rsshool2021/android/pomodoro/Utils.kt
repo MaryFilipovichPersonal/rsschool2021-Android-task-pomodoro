@@ -2,7 +2,7 @@ package com.rsshool2021.android.pomodoro
 
 object Utils {
 
-    private const val START_TIME = "00:00:00:00"
+    private const val START_TIME = "00:00:00"
 
     fun convertToMilliseconds(h: Int = 0, m: Int = 0, s: Int = 0): Long {
         val msFromH = h.toLong() * 60 * 60 * 1000

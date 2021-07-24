@@ -1,6 +1,7 @@
 package com.rsshool2021.android.pomodoro.countdowntimer
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -22,6 +23,9 @@ class NewTimersListFragment : Fragment(), TimerListener {
     private val listAdapter = NewTimerListAdapter(this)
     private var timers = mutableListOf<NewTimer>()
     private var nextId = 0
+    private lateinit var startedTimer: NewTimer
+
+    private var countDownTimer: CountDownTimer? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,7 +33,7 @@ class NewTimersListFragment : Fragment(), TimerListener {
     ): View {
         _binding = FragmentNewTimersListBinding.inflate(inflater, container, false)
         return binding.root
-        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,9 +72,6 @@ class NewTimersListFragment : Fragment(), TimerListener {
         submitTimerList()
     }
 
-    private fun submitTimerList(newList: MutableList<NewTimer> = timers) {
-        listAdapter.submitList(newList.toList())
-    }
 
     private fun showAddTimerFragment() {
         val addTimerFragment = AddTimerFragment.newInstance()
@@ -81,19 +82,82 @@ class NewTimersListFragment : Fragment(), TimerListener {
     }
 
     override fun start(id: Int) {
-
+        val newList = listAdapter.currentList.toMutableList()
+        val index = timers.indexOf(timers.find { it.id == id })
+//        val updatedItem = newList[index]
+        newList.forEach { it.isStarted = false}
+//        timers.forEach { timer -> timer.copy(isStarted = false).let { newList[index] = it } }
+        timers[index].copy(isStarted = true).let { newList[index] = it }
+        submitTimerList(newList)
+        timers = newList
+        countDownTimer?.cancel()
+        countDownTimer = getCountDownTimer(newList[index])
+        countDownTimer?.start()
     }
 
     override fun stop(id: Int, currentMs: Long) {
-
+        val newList = listAdapter.currentList.toMutableList()
+        val index = timers.indexOf(timers.find { it.id == id })
+        timers.find { it.id == id }?.copy(
+            isStarted = false
+        )?.let {
+            newList[index] = it
+        }
+        submitTimerList(newList)
+        timers = newList
+        countDownTimer?.cancel()
     }
 
     override fun reset(id: Int) {
-
+        val newList = listAdapter.currentList.toMutableList()
+        val index = timers.indexOf(timers.find { it.id == id })
+        timers.find { it.id == id }?.copy(
+            currentMs = timers[index].period,
+            isStarted = false
+        )?.let {
+            newList[index] = it
+        }
+        submitTimerList(newList)
+        timers = newList
+        countDownTimer?.cancel()
     }
 
     override fun delete(id: Int) {
+        timers.remove(timers.find { it.id == id })
+        submitTimerList()
+    }
 
+    private fun getCountDownTimer(timer: NewTimer): CountDownTimer {
+        return object : CountDownTimer(timer.period, INTERVAL) {
+
+            override fun onTick(millisUntilFinished: Long) {
+                val newList = listAdapter.currentList.toMutableList()
+                val index = newList.indexOf(newList.find { it.id == timer.id })
+                newList.find { it.id == timer.id }?.copy(currentMs = newList[index].currentMs - INTERVAL)?.let {
+                    newList[index] = it
+                }
+                submitTimerList(newList)
+                timers = newList
+            }
+
+            override fun onFinish() {
+                val newList = listAdapter.currentList.toMutableList()
+                val index = newList.indexOf(newList.find { it.id == timer.id })
+                newList[index].copy(isStarted = false).let { newList[index] = it }
+                submitTimerList(newList)
+                timers = newList
+                Toast.makeText(
+                    context,
+                    if (newList[index].currentMs <= 0L) "Timer is over" else "Timer was stopped",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        }
+    }
+
+    private fun submitTimerList(newList: MutableList<NewTimer> = timers) {
+        listAdapter.submitList(newList.toList())
     }
 
     companion object {
