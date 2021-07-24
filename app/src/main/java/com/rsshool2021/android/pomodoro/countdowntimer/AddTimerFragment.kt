@@ -1,13 +1,15 @@
 package com.rsshool2021.android.pomodoro.countdowntimer
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.rsshool2021.android.pomodoro.*
+import com.rsshool2021.android.pomodoro.ADD_TIMER_REQUEST_KEY
+import com.rsshool2021.android.pomodoro.MainActivity
+import com.rsshool2021.android.pomodoro.TIMER_BUNDLE_PERIOD_KEY
+import com.rsshool2021.android.pomodoro.Utils
 import com.rsshool2021.android.pomodoro.databinding.FragmentAddTimerBinding
 
 class AddTimerFragment : BottomSheetDialogFragment() {

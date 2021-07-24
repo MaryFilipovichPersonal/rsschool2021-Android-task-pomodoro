@@ -2,7 +2,7 @@ package com.rsshool2021.android.pomodoro
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.rsshool2021.android.pomodoro.countdowntimer.NewTimersListFragment
+import com.rsshool2021.android.pomodoro.countdowntimer.TimersListFragment
 import com.rsshool2021.android.pomodoro.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setTimersFragment() {
         supportFragmentManager.beginTransaction()
-            .replace(binding.amFcvContainer.id, NewTimersListFragment.newInstance(), TIMERS_LIST_FRAGMENT_TAG)
+            .replace(binding.amFcvContainer.id, TimersListFragment.newInstance(), TIMERS_LIST_FRAGMENT_TAG)
             .commit()
     }
 
