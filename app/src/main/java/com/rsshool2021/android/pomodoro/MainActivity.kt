@@ -15,18 +15,20 @@ import com.rsshool2021.android.pomodoro.countdowntimer.Timer
 import com.rsshool2021.android.pomodoro.countdowntimer.TimersListFragment
 import com.rsshool2021.android.pomodoro.databinding.ActivityMainBinding
 import com.rsshool2021.android.pomodoro.service.TIMER_CURRENT_MS
-import com.rsshool2021.android.pomodoro.service.TIMER_ID
 import com.rsshool2021.android.pomodoro.service.TIMER_STATE
 import com.rsshool2021.android.pomodoro.service.TimerForegroundService
 
 const val TIMER_ACTION = "TimerAction"
 
-class MainActivity : AppCompatActivity(), LifecycleObserver {
+class MainActivity : AppCompatActivity(), LifecycleObserver, FragmentResponseService {
 
     private lateinit var binding: ActivityMainBinding
 
     // Foreground receiver
     private val timerReceiver: TimerReceiver by lazy { TimerReceiver() }
+
+    private var startedTimer: Timer? = null
+    private var requestService: ActivityRequestService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,10 +47,12 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
-        val startIntent = Intent(this, TimerForegroundService::class.java)
-        startIntent.putExtra(COMMAND_ID, COMMAND_START)
-        startIntent.putExtra(TIMER_STATE, 16000L)
-        startService(startIntent)
+        startedTimer?.let { timer ->
+            val startIntent = Intent(this, TimerForegroundService::class.java)
+            startIntent.putExtra(COMMAND_ID, COMMAND_START)
+            startIntent.putExtra(TIMER_STATE, timer.currentMs)
+            startService(startIntent)
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
@@ -64,8 +68,14 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
     }
 
     override fun onPause() {
+        (supportFragmentManager.findFragmentByTag(TIMERS_LIST_FRAGMENT_TAG) as ActivityRequestService).onStartedTimerRequest()
         unregisterReceiver(timerReceiver)
         super.onPause()
+    }
+
+    override fun onStartedTimerResponse(timer: Timer?) {
+        Log.d("MainActivity", "response: timer = ${timer.toString()}")
+        startedTimer = timer
     }
 
     companion object {
@@ -76,8 +86,10 @@ class MainActivity : AppCompatActivity(), LifecycleObserver {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == TIMER_ACTION) {
                 val currentMs = intent.getLongExtra(TIMER_CURRENT_MS, 0)
-                Log.d("MainActivity", "ms: $currentMs")
+                (supportFragmentManager.findFragmentByTag(TIMERS_LIST_FRAGMENT_TAG) as ActivityRequestService).onForegroundServiceResult(currentMs)
+                startedTimer = null
             }
         }
     }
+
 }

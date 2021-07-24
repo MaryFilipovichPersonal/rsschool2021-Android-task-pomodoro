@@ -5,7 +5,6 @@ import android.view.View
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
 import com.rsshool2021.android.pomodoro.R
-import com.rsshool2021.android.pomodoro.TimerListener
 import com.rsshool2021.android.pomodoro.Utils.displayTime
 import com.rsshool2021.android.pomodoro.databinding.ViewHolderTimerBinding
 

@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.rsshool2021.android.pomodoro.TimerListener
 import com.rsshool2021.android.pomodoro.databinding.ViewHolderTimerBinding
 
 class TimerListAdapter (private val listener: TimerListener) :

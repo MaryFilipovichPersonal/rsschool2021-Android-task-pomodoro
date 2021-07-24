@@ -1,7 +1,9 @@
 package com.rsshool2021.android.pomodoro.countdowntimer
 
+import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.rsshool2021.android.pomodoro.*
 import com.rsshool2021.android.pomodoro.databinding.FragmentTimersListBinding
 
-class TimersListFragment : Fragment(), TimerListener {
+class TimersListFragment : Fragment(), TimerListener, ActivityRequestService {
 
     private var _binding: FragmentTimersListBinding? = null
     private val binding get() = _binding!!
@@ -24,6 +26,8 @@ class TimersListFragment : Fragment(), TimerListener {
     private lateinit var startedTimer: Timer
 
     private var countDownTimer: CountDownTimer? = null
+
+    private var responseService: FragmentResponseService? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +48,18 @@ class TimersListFragment : Fragment(), TimerListener {
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is FragmentResponseService) {
+            responseService = context
+        }
+    }
+
+    override fun onDetach() {
+        responseService = null
+        super.onDetach()
     }
 
     private fun setRecyclerViewAdapter() {
@@ -155,6 +171,19 @@ class TimersListFragment : Fragment(), TimerListener {
         fun newInstance() = TimersListFragment()
 
         private const val INTERVAL = 1000L
+    }
+
+    override fun onStartedTimerRequest() {
+        if (this::startedTimer.isInitialized && timers.contains(startedTimer))
+            (requireActivity() as FragmentResponseService).onStartedTimerResponse(if (startedTimer.isStarted) startedTimer else null)
+        else
+            (requireActivity() as FragmentResponseService).onStartedTimerResponse(null)
+    }
+
+    override fun onForegroundServiceResult(currentMs: Long) {
+        Log.d("TimersListFragment", "ms: $currentMs")
+        startedTimer.currentMs = currentMs
+        listAdapter.notifyItemChanged(timers.indexOf(startedTimer))
     }
 
 }
